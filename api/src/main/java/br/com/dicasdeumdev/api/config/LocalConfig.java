@@ -9,18 +9,19 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
 import java.util.List;
+import java.util.Optional;
 
 @Configuration
-@Profile ("local")
+@Profile("local")
 public class LocalConfig {
 
     @Autowired
-    private UserRepository userRepository ;
-    @PostConstruct
-    public void startDB(){
-        User u1 = new User (null,"Lucas","lucascsotaaguiar@hotmail.com","123");
-        User u2 = new User (null,"Adevalter","adevalter@hotmail.com","1234");
+    private UserRepository userRepository;
 
-        userRepository.saveAll ( List.of (u1,u2) );
+    @PostConstruct
+    public void startDB() {
+        User u1 = new User ( null, "Lucas", "lucascostaaguiar@hotmail.com", "123" );
+        User u2 = new User ( null, "Adevalter", "adevalter@hotmail.com", "1234" );
+
     }
 }
