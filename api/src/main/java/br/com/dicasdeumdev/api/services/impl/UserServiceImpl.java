@@ -25,30 +25,37 @@ public class UserServiceImpl implements UserService {
     @Override
     public User findById(Integer id) {
         Optional<User> user = userRepository.findById ( id );
-        return user.orElseThrow (()->new ObjectNotFoundException ( "Objeto não encontrado" ));
+        return user.orElseThrow ( () -> new ObjectNotFoundException ( "Objeto não encontrado" ) );
 
     }
-    public List<User> findAll(){
+
+    public List<User> findAll() {
         return userRepository.findAll ();
     }
 
     @Override
     public User create(UserDTO obj) {
         findByEmail ( obj );
-        return userRepository.save ( mapper.map ( obj,User.class ) );
+        return userRepository.save ( mapper.map ( obj, User.class ) );
     }
 
     @Override
     public User update(UserDTO obj) {
         findByEmail ( obj );
-        return userRepository.save ( mapper.map ( obj,User.class ) );
+        return userRepository.save ( mapper.map ( obj, User.class ) );
     }
 
-    public void findByEmail(UserDTO obj){
-         Optional<User>user =userRepository.findByEmail ( obj.getEmail () );
-             if(user.isPresent() && !user.get ().getId ().equals ( obj .getId ())){
-                 throw new DataIntegrityViolationException ( "E-mail já está cadastrado no sistema." );
-             }
+    @Override
+    public void delete(Integer id) {
+        findById (id);
+        userRepository.deleteById (id);
+    }
+
+    public void findByEmail(UserDTO obj) {
+        Optional<User> user = userRepository.findByEmail ( obj.getEmail () );
+        if (user.isPresent () && ! user.get ().getId ().equals ( obj.getId () )) {
+            throw new DataIntegrityViolationException ( "E-mail já está cadastrado no sistema." );
         }
     }
+}
 
