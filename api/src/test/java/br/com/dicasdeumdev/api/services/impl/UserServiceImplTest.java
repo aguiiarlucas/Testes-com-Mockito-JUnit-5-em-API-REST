@@ -3,6 +3,7 @@ package br.com.dicasdeumdev.api.services.impl;
 import br.com.dicasdeumdev.api.domain.User;
 import br.com.dicasdeumdev.api.domain.dto.UserDTO;
 import br.com.dicasdeumdev.api.repositories.UserRepository;
+import br.com.dicasdeumdev.api.services.exceptions.DataIntegrityViolationException;
 import br.com.dicasdeumdev.api.services.exceptions.ObjectNotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,7 +21,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -32,6 +33,7 @@ class UserServiceImplTest {
     public static final String PASSWORD = "1234";
     public static final String OBJETO_NAO_ENCONTRADO = "Objeto não encontrado";
     public static final int INDEX = 0;
+    public static final String EMAIL_JA_CADASTRADO = "E-mail já está cadastrado no sistema.";
     @InjectMocks
     private UserServiceImpl service;
     @Mock
@@ -68,28 +70,54 @@ class UserServiceImplTest {
 
         try {
             service.findById ( ID );
-        } catch (Exception e) {
-            assertEquals ( ObjectNotFoundException.class, e.getClass () );
-            assertEquals ( OBJETO_NAO_ENCONTRADO, e.getMessage () );
+        } catch (Exception ex) {
+            assertEquals ( ObjectNotFoundException.class, ex.getClass () );
+            assertEquals ( OBJETO_NAO_ENCONTRADO, ex.getMessage () );
         }
     }
 
     @Test
     void whenFindAllThenReturnAnListOfUsers() { //Quando buscar todos, me retorne uma lista de usuarios {
-        when ( repository.findAll () ).thenReturn (List.of(user));
-        List<User>response = service.findAll ();
+        when ( repository.findAll () ).thenReturn ( List.of ( user ) );
+        List<User> response = service.findAll ();
         assertNotNull ( response );
-        assertEquals ( 1,response.size () );
-        assertEquals ( User.class,response.get(INDEX).getClass () );
+        assertEquals ( 1, response.size () );
+        assertEquals ( User.class, response.get ( INDEX ).getClass () );
 
-        assertEquals ( ID,response.get ( INDEX ).getId () );
-        assertEquals ( NAME,response.get (INDEX).getName () );
-        assertEquals ( EMAIL,response.get (INDEX).getEmail () );
-        assertEquals ( PASSWORD,response.get (INDEX).getPassword () );
+        assertEquals ( ID, response.get ( INDEX ).getId () );
+        assertEquals ( NAME, response.get ( INDEX ).getName () );
+        assertEquals ( EMAIL, response.get ( INDEX ).getEmail () );
+        assertEquals ( PASSWORD, response.get ( INDEX ).getPassword () );
     }
 
     @Test
-    void create() {
+    void whenCreateThenReturnSuccess() {// Quando criar , me retorne com sucesso
+        when ( repository.save ( any () ) ).thenReturn ( user );
+        User response = service.create ( userDTO );
+
+        assertNotNull ( response );
+        assertEquals ( User.class, response.getClass () );
+
+        assertEquals ( ID,response.getId () );
+        assertEquals ( NAME,response.getName () );
+        assertEquals ( EMAIL,response.getEmail () );
+        assertEquals ( PASSWORD,response.getPassword () );
+    }
+
+    @Test
+    void whenCreateThenReturnAnDataIntegrityViolationException() {// Quando criar , me retorne
+                                                                 // uma excessão de violacao de interegraçao de dados
+        when ( repository.findByEmail ( anyString () ) ).thenReturn ( optionalUser );
+        User response = service.create ( userDTO );
+
+        try {
+            optionalUser.get ().setId ( 2 );
+            service.create ( userDTO     );
+        }catch (DataIntegrityViolationException ex){
+            assertEquals ( DataIntegrityViolationException.class,ex.getClass () );
+            assertEquals ( EMAIL_JA_CADASTRADO,ex.getMessage () );
+        }
+
     }
 
     @Test
