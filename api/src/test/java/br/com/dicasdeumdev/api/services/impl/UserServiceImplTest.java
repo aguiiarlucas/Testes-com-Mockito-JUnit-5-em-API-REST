@@ -108,7 +108,6 @@ class UserServiceImplTest {
     void whenCreateThenReturnAnDataIntegrityViolationException() {// Quando criar , me retorne
                                                                  // uma excessão de violacao de interegraçao de dados
         when ( repository.findByEmail ( anyString () ) ).thenReturn ( optionalUser );
-        User response = service.create ( userDTO );
 
         try {
             optionalUser.get ().setId ( 2 );
@@ -121,7 +120,31 @@ class UserServiceImplTest {
     }
 
     @Test
-    void update() {
+    void whenUpdateThenReturnSuccess() {// Quando fazer um update , me retorne com sucesso
+        when ( repository.save ( any () ) ).thenReturn ( user );
+        User response = service.update ( userDTO );
+
+        assertNotNull ( response );
+        assertEquals ( User.class, response.getClass () );
+
+        assertEquals ( ID,response.getId () );
+        assertEquals ( NAME,response.getName () );
+        assertEquals ( EMAIL,response.getEmail () );
+        assertEquals ( PASSWORD,response.getPassword () );
+    }
+    @Test
+    void whenUpdateThenReturnAnDataIntegrityViolationException() {// Quando criar , me retorne
+        // uma excessão de violacao de interegraçao de dados
+        when ( repository.findByEmail ( anyString () ) ).thenReturn ( optionalUser );
+
+        try {
+            optionalUser.get ().setId ( 2 );
+            service.create ( userDTO     );
+        }catch (DataIntegrityViolationException ex){
+            assertEquals ( DataIntegrityViolationException.class,ex.getClass () );
+            assertEquals ( EMAIL_JA_CADASTRADO,ex.getMessage () );
+        }
+
     }
 
     @Test
