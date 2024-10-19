@@ -163,7 +163,7 @@ class UserServiceImplTest {
         verify(repository, times(1)).deleteById(anyInt());
     }
     @Test
-    void deleteWithObjectNotFoundException() {
+    void whenDeleteWithObjectNotFoundException() {
         when ( repository.findById ( anyInt () ) ).thenThrow ( new ObjectNotFoundException ( OBJETO_NAO_ENCONTRADO ) );
         try {
             service.delete ( ID );
@@ -171,11 +171,6 @@ class UserServiceImplTest {
             assertEquals ( ObjectNotFoundException.class,ex.getClass () );
             assertEquals ( OBJETO_NAO_ENCONTRADO,ex.getMessage () );
         }
-    }
-
-
-    @Test
-    void findByEmail() {
     }
 
     private void startUser() {
