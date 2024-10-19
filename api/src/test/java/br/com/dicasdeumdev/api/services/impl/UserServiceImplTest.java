@@ -22,7 +22,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest
 class UserServiceImplTest {
@@ -98,23 +98,23 @@ class UserServiceImplTest {
         assertNotNull ( response );
         assertEquals ( User.class, response.getClass () );
 
-        assertEquals ( ID,response.getId () );
-        assertEquals ( NAME,response.getName () );
-        assertEquals ( EMAIL,response.getEmail () );
-        assertEquals ( PASSWORD,response.getPassword () );
+        assertEquals ( ID, response.getId () );
+        assertEquals ( NAME, response.getName () );
+        assertEquals ( EMAIL, response.getEmail () );
+        assertEquals ( PASSWORD, response.getPassword () );
     }
 
     @Test
     void whenCreateThenReturnAnDataIntegrityViolationException() {// Quando criar , me retorne
-                                                                 // uma excessão de violacao de interegraçao de dados
+        // uma excessão de violacao de interegraçao de dados
         when ( repository.findByEmail ( anyString () ) ).thenReturn ( optionalUser );
 
         try {
             optionalUser.get ().setId ( 2 );
-            service.create ( userDTO     );
-        }catch (DataIntegrityViolationException ex){
-            assertEquals ( DataIntegrityViolationException.class,ex.getClass () );
-            assertEquals ( EMAIL_JA_CADASTRADO,ex.getMessage () );
+            service.create ( userDTO );
+        } catch (DataIntegrityViolationException ex) {
+            assertEquals ( DataIntegrityViolationException.class, ex.getClass () );
+            assertEquals ( EMAIL_JA_CADASTRADO, ex.getMessage () );
         }
 
     }
@@ -127,11 +127,12 @@ class UserServiceImplTest {
         assertNotNull ( response );
         assertEquals ( User.class, response.getClass () );
 
-        assertEquals ( ID,response.getId () );
-        assertEquals ( NAME,response.getName () );
-        assertEquals ( EMAIL,response.getEmail () );
-        assertEquals ( PASSWORD,response.getPassword () );
+        assertEquals ( ID, response.getId () );
+        assertEquals ( NAME, response.getName () );
+        assertEquals ( EMAIL, response.getEmail () );
+        assertEquals ( PASSWORD, response.getPassword () );
     }
+
     @Test
     void whenUpdateThenReturnAnDataIntegrityViolationException() {// Quando criar , me retorne
         // uma excessão de violacao de interegraçao de dados
@@ -139,17 +140,39 @@ class UserServiceImplTest {
 
         try {
             optionalUser.get ().setId ( 2 );
-            service.create ( userDTO     );
-        }catch (DataIntegrityViolationException ex){
-            assertEquals ( DataIntegrityViolationException.class,ex.getClass () );
-            assertEquals ( EMAIL_JA_CADASTRADO,ex.getMessage () );
+            service.create ( userDTO );
+        } catch (DataIntegrityViolationException ex) {
+            assertEquals ( DataIntegrityViolationException.class, ex.getClass () );
+            assertEquals ( EMAIL_JA_CADASTRADO, ex.getMessage () );
         }
 
     }
 
     @Test
-    void delete() {
+    void deleteWithSuccess() {
+        // Simula o comportamento de repository.findById retornando optionalUser quando chamado
+        when(repository.findById(anyInt())).thenReturn(optionalUser);
+
+        // Não há necessidade de usar doNothing() aqui, pois deleteById é um método void
+        doNothing().when(repository).deleteById(anyInt());
+
+        // Executa o método delete da service
+        service.delete(ID);
+
+        // Verifica se deleteById foi chamado exatamente uma vez
+        verify(repository, times(1)).deleteById(anyInt());
     }
+    @Test
+    void deleteWithObjectNotFoundException() {
+        when ( repository.findById ( anyInt () ) ).thenThrow ( new ObjectNotFoundException ( OBJETO_NAO_ENCONTRADO ) );
+        try {
+            service.delete ( ID );
+        }catch (Exception ex){
+            assertEquals ( ObjectNotFoundException.class,ex.getClass () );
+            assertEquals ( OBJETO_NAO_ENCONTRADO,ex.getMessage () );
+        }
+    }
+
 
     @Test
     void findByEmail() {
