@@ -17,6 +17,8 @@ import java.util.Optional;
 @Service
 public class UserServiceImpl implements UserService {
 
+    public static final String OBJETO_NÃO_ENCONTRADO = "Objeto não encontrado";
+    public static final String E_MAIL_JÁ_ESTÁ_CADASTRADO_NO_SISTEMA = "E-mail já está cadastrado no sistema.";
     @Autowired
     private ModelMapper mapper;
     @Autowired
@@ -27,7 +29,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User findById(Integer id) {
         Optional<User> user = userRepository.findById ( id );
-        return user.orElseThrow ( () -> new ObjectNotFoundException ( "Objeto não encontrado" ) );
+        return user.orElseThrow ( () -> new ObjectNotFoundException ( OBJETO_NÃO_ENCONTRADO ) );
 
     }
 
@@ -56,7 +58,7 @@ public class UserServiceImpl implements UserService {
     public void findByEmail(UserDTO obj) {
         Optional<User> user = userRepository.findByEmail ( obj.getEmail () );
         if (user.isPresent () && ! user.get ().getId ().equals ( obj.getId () )) {
-            throw new DataIntegrityViolationException ( "E-mail já está cadastrado no sistema." );
+            throw new DataIntegrityViolationException ( E_MAIL_JÁ_ESTÁ_CADASTRADO_NO_SISTEMA );
         }
     }
 }

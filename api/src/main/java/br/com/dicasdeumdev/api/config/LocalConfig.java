@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,6 +23,8 @@ public class LocalConfig {
     public void startDB() {
         User u1 = new User ( null, "Lucas", "lucascostaaguiar@hotmail.com", "123" );
         User u2 = new User ( null, "Adevalter", "adevalter@hotmail.com", "1234" );
+
+        userRepository.saveAll( Arrays.asList(u1, u2));
 
     }
 }

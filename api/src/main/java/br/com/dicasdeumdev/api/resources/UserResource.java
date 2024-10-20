@@ -31,11 +31,12 @@ public class UserResource {
 
     @GetMapping
     public ResponseEntity<List<UserDTO>> findAll() {
-        var users = service.findAll ();
-        var userDTOs = users.stream ()
-                .map ( user -> mapper.map ( user, UserDTO.class ) )
-                .collect ( Collectors.toList () );
-        return ResponseEntity.ok ( userDTOs );
+//        var users = service.findAll ();
+//        var userDTOs = users.stream ()
+//                .map ( user -> mapper.map ( user, UserDTO.class ) )
+//                .collect ( Collectors.toList () );
+//        return ResponseEntity.ok ( userDTOs );
+        return ResponseEntity.ok ().body ( service.findAll ().stream ().map ( x->mapper.map ( x,UserDTO.class ) ).collect( Collectors.toList()) );
     }
 
     @PostMapping
