@@ -77,7 +77,9 @@ class UserServiceImplTest {
     void whenFindAllThenReturnAnListOfUsers() { //Quando buscar todos, me retorne uma lista de usuarios {
         when ( repository.findAll () ).thenReturn ( List.of ( user ) );
         List<User> response = service.findAll ();
+
         assertNotNull ( response );
+
         assertEquals ( 1, response.size () );
         assertEquals ( User.class, response.get ( INDEX ).getClass () );
 
