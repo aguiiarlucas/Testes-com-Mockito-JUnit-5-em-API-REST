@@ -3,6 +3,7 @@ package br.com.dicasdeumdev.api.resources.exceptions;
 import br.com.dicasdeumdev.api.domain.User;
 import br.com.dicasdeumdev.api.domain.dto.UserDTO;
 import br.com.dicasdeumdev.api.resources.UserResource;
+import br.com.dicasdeumdev.api.services.exceptions.DataIntegrityViolationException;
 import br.com.dicasdeumdev.api.services.exceptions.ObjectNotFoundException;
 import br.com.dicasdeumdev.api.services.impl.UserServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,6 +27,7 @@ class ResourceExceptionHandlerTest {
 
 
     public static final String RESOURCE_NOT_FOUND = "Resource not found ";
+    public static final String EMAIL_JÁ_CADASTRADO = "Email já cadastrado";
     @InjectMocks
     private ResourceExceptionHandler resourceExceptionHandler;
     private User user;
@@ -55,7 +57,19 @@ class ResourceExceptionHandlerTest {
     }
 
     @Test
-    void dataIntegratyViolationException() {
+    void whenDataIntegratyViolationExceptionThenReturnAResponseEntity() {
+        ResponseEntity<StandardError> response = resourceExceptionHandler.dataIntegratyViolationException (
+                ( new DataIntegrityViolationException ( EMAIL_JÁ_CADASTRADO )), new MockHttpServletRequest () );
+
+
+        assertNotNull ( response );
+        assertNotNull ( response.getBody () );
+        assertNotNull ( EMAIL_JÁ_CADASTRADO,response.getBody ().getError () );
+
+        assertEquals ( HttpStatus.BAD_REQUEST,response.getStatusCode () );
+        assertEquals ( ResponseEntity.class,response.getClass () );
+        assertEquals ( StandardError.class,response.getBody ().getClass () );
+        assertEquals ( 400,response.getBody ().getStatus () );
     }
 
 
