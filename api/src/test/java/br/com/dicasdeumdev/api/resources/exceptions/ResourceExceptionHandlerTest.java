@@ -18,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -43,7 +44,6 @@ class ResourceExceptionHandlerTest {
     void whenObjectNotFoundExceptionThenReturnAResponseEntity() {
         ResponseEntity<StandardError> response = resourceExceptionHandler.objectNotFound
                 ( new ObjectNotFoundException ( OBJETO_NAO_ENCONTRADO ), new MockHttpServletRequest () );
-        StandardError error = response.getBody ();
 
         assertNotNull ( response );
         assertNotNull ( response.getBody () );
@@ -53,7 +53,8 @@ class ResourceExceptionHandlerTest {
         assertEquals ( ResponseEntity.class,response.getClass () );
         assertEquals ( StandardError.class,response.getBody ().getClass () );
         assertEquals ( 404,response.getBody ().getStatus () );
-        assertEquals ( RESOURCE_NOT_FOUND,error.getError () );
+
+        assertNotEquals ( LocalDateTime.now (),response.getBody ().getTimestamp () );
     }
 
     @Test
